@@ -24,6 +24,91 @@ $ composer require slick/i18n
 
 ## Usage
 
+### Messages file
+
+Create a messages file:
+
+```php
+/**
+ * pt_PT messages file
+ */
+
+return [
+    '' => array(
+            'plural_forms' => 'nplurals=2; plural=n!=1;'
+        ),
+    'Hello world' => 'Olá mundo',
+    'User' => ['Utilizador', 'Utilizadores'],
+    'Users' = ''
+];
+
+```
+
+save this file in `./i18n/pt_PT/default.php`.
+
+### Language negotiation and setup
+
+Now lets get our translator:
+
+```php
+
+use Slick\I18n\Translator;
+
+/**
+ * Set locale for the based on the browser accept language
+ */
+$locale = 'en_US';
+if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+    $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
+}
+
+Translator::getInstance()->setLocale($locale)
+    ->type = 'phparray';
+setlocale(LC_ALL, $locale);
+
+```
+
+The code above is watching the browser to check the language in it and set the
+locale for our translator object. From now on just use the translation methods
+on the strings you want to translate.
+
+### Message translation
+
+```php
+$t = Translator::getInstance();
+
+echo $t->translate('Hello world');  // will output 'Olá mundo' 
+```
+
+### Plural translation
+
+```php
+$t = Translator::getInstance();
+
+echo $t->translatePlural('User', 'Users', 2);  // will output 'Utilizadores' 
+```
+
+### Using in your classes
+
+You can add translation functionality to your classes by using the
+`TranslateMethods` trait.
+
+```php
+use Slick\I18n\TranslateMethods;
+
+class MyClass
+{
+
+    use TranslateMethods;
+    
+    public function getUsers()
+    {
+        return $this->translatePlural('User', 'Users', $this->getUserCount());
+    }
+}
+ 
+```
+
 ## Testing
 
 ``` bash
