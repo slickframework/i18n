@@ -2,9 +2,9 @@
 
 [![Latest Version](https://img.shields.io/github/release/slickframework/i18n.svg?style=flat-square)](https://github.com/slickframework/i18n/releases)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/slickframework/i18n/master.svg?style=flat-square)](https://travis-ci.org/slickframework/i18n)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/slickframework/i18n/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/slickframework/i18n/code-structure?branch=master)
-[![Quality Score](https://img.shields.io/scrutinizer/g/slickframework/i18n/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/slickframework/i18n?branch=master)
+[![Build Status](https://img.shields.io/travis/slickframework/i18n/develop.svg?style=flat-square)](https://travis-ci.org/slickframework/i18n)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/slickframework/i18n/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/slickframework/i18n/code-structure?branch=develop)
+[![Quality Score](https://img.shields.io/scrutinizer/g/slickframework/i18n/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/slickframework/i18n?branch=develop)
 [![Total Downloads](https://img.shields.io/packagist/dt/slick/i18n.svg?style=flat-square)](https://packagist.org/packages/slick/i18n)
 
 Slick I18n is a simple translation and internationalization package for Slick.
