@@ -62,8 +62,10 @@ if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 }
 
-Translator::getInstance()->setLocale($locale)
-    ->type = 'phparray';
+Translator::getInstance()
+    ->setLocale($locale)
+    ->setType(Translator::TYPE_PHP_ARRAY);
+    
 setlocale(LC_ALL, $locale);
 
 ```

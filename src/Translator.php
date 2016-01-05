@@ -30,6 +30,10 @@ use Zend\I18n\Translator\Translator as ZendTranslator;
  */
 class Translator
 {
+
+    const TYPE_PHP_ARRAY = 'php-array';
+    const TYPE_GETTEXT   = 'gettext';
+
     /**
      * @readwrite
      * @var ZendTranslator
@@ -70,8 +74,8 @@ class Translator
      * @var array
      */
     private $types = [
-        'gettext' => '.mo',
-        'phparray' => '.php'
+        self::TYPE_GETTEXT   => '.mo',
+        self::TYPE_PHP_ARRAY => '.php'
     ];
 
     /**
@@ -104,18 +108,6 @@ class Translator
      * @return void
      */
     private function __clone()
-    {
-    }
-
-    /**
-     * Private unserialize method to prevent unserializing of the *Singleton*
-     * instance.
-     *
-     * @codeCoverageIgnore
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     * @return void
-     */
-    private function __wakeup()
     {
     }
 
@@ -233,7 +225,7 @@ class Translator
      */
     public function getLocale()
     {
-        return $this->configuration->
-        get('i18n.locale', $this->fallbackLocale);
+        return $this->getConfiguration()
+            ->get('i18n.locale', $this->fallbackLocale);
     }
 }
