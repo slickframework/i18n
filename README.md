@@ -55,7 +55,7 @@ Now lets get our translator:
 use Slick\I18n\Translator;
 
 /**
- * Set locale for the based on the browser accept language
+ * Set locale based on the browser accept language
  */
 $locale = 'en_US';
 if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
@@ -68,7 +68,7 @@ setlocale(LC_ALL, $locale);
 
 ```
 
-The code above is watching the browser to check the language in it and set the
+The code above is using the browser's language to set the
 locale for our translator object. From now on just use the translation methods
 on the strings you want to translate.
 
