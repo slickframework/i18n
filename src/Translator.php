@@ -34,42 +34,42 @@ class Translator
      * @readwrite
      * @var ZendTranslator
      */
-    protected $_translatorService;
+    protected $translatorService;
 
     /**
      * @readwrite
      * @var DriverInterface
      */
-    protected $_configuration;
+    protected $configuration;
 
     /**
      * @readwrite
      * @var string The message domain
      */
-    protected $_domain = 'default';
+    protected $domain = 'default';
 
     /**
      * @readwrite
      * @var string Default fallback locale
      */
-    protected $_fallbackLocale = 'en_US';
+    protected $fallbackLocale = 'en_US';
 
     /**
      * @readwrite
      * @var string
      */
-    protected $_basePath = './I18n';
+    protected $basePath = './I18n';
 
     /**
      * @readwrite
      * @var string
      */
-    protected $_type = 'gettext';
+    protected $type = 'gettext';
 
     /**
      * @var array
      */
-    private $_types = [
+    private $types = [
         'gettext' => '.mo',
         'phparray' => '.php'
     ];
@@ -77,7 +77,7 @@ class Translator
     /**
      * @var Translator
      */
-    private static $_instance;
+    private static $instance;
 
     /**
      * Trait with method for base class
@@ -126,10 +126,10 @@ class Translator
      */
     public function getConfiguration()
     {
-        if (is_null($this->_configuration)) {
-            $this->_configuration = Configuration::get('config');
+        if (is_null($this->configuration)) {
+            $this->configuration = Configuration::get('config');
         }
-        return $this->_configuration;
+        return $this->configuration;
     }
 
     /**
@@ -139,7 +139,7 @@ class Translator
      */
     public function getTranslatorService()
     {
-        if (is_null($this->_translatorService)) {
+        if (is_null($this->translatorService)) {
             $translator = new ZendTranslator();
             $translator->addTranslationFilePattern(
                 $this->type,
@@ -147,9 +147,9 @@ class Translator
                 '%s/'.$this->getMessageFile(),
                 $this->domain
             );
-            $this->_translatorService = $translator;
+            $this->translatorService = $translator;
         }
-        return $this->_translatorService;
+        return $this->translatorService;
     }
 
     /**
@@ -160,7 +160,7 @@ class Translator
     public function getMessageFile()
     {
         $name = $this->domain;
-        $name .= $this->_types[$this->type];
+        $name .= $this->types[$this->type];
         return $name;
     }
 
@@ -207,10 +207,10 @@ class Translator
      */
     public static function getInstance($options = array())
     {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new Translator($options);
+        if (is_null(self::$instance)) {
+            self::$instance = new Translator($options);
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     /**
