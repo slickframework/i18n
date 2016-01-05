@@ -173,10 +173,8 @@ class Translator
      */
     public function translate($message)
     {
-        $locale = $this->configuration
-            ->get('i18n.locale', $this->fallbackLocale);
         return $this->getTranslatorService()
-            ->translate($message, $this->domain, $locale);
+            ->translate($message, $this->domain, $this->getLocale());
     }
 
     /**
@@ -190,15 +188,13 @@ class Translator
      */
     public function translatePlural($singular, $plural, $number)
     {
-        $locale = $this->configuration->
-        get('i18n.locale', $this->fallbackLocale);
         return $this->getTranslatorService()
             ->translatePlural(
                 $singular,
                 $plural,
                 $number,
                 $this->domain,
-                $locale
+                $this->getLocale()
             );
     }
 
@@ -211,10 +207,10 @@ class Translator
      */
     public static function getInstance($options = array())
     {
-        if (is_null(static::$_instance)) {
-            static::$_instance = new Translator($options);
+        if (is_null(self::$_instance)) {
+            self::$_instance = new Translator($options);
         }
-        return static::$_instance;
+        return self::$_instance;
     }
 
     /**
@@ -228,5 +224,16 @@ class Translator
     {
         $this->getConfiguration()->set('i18n.locale', $locale);
         return $this;
+    }
+
+    /**
+     * Gets current configured locale
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->configuration->
+        get('i18n.locale', $this->fallbackLocale);
     }
 }
