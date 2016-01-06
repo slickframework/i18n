@@ -27,6 +27,10 @@ use Zend\I18n\Translator\Translator as ZendTranslator;
  * @property string $basePath
  * @property string $domain
  * @property string $fallbackLocale
+ *
+ * @method Translator setBasePath(string $basePath)
+ * @method Translator setDomain(string $domainName)
+ * @method Translator setType(string $domainName)
  */
 class Translator
 {
@@ -71,6 +75,11 @@ class Translator
     protected $type = 'gettext';
 
     /**
+     * @var string
+     */
+    protected $activeLocale;
+
+    /**
      * @var array
      */
     private $types = [
@@ -109,19 +118,6 @@ class Translator
      */
     private function __clone()
     {
-    }
-
-    /**
-     * Lazy loads configuration
-     *
-     * @return DriverInterface
-     */
-    public function getConfiguration()
-    {
-        if (is_null($this->configuration)) {
-            $this->configuration = Configuration::get('config');
-        }
-        return $this->configuration;
     }
 
     /**
@@ -214,7 +210,7 @@ class Translator
      */
     public function setLocale($locale)
     {
-        $this->getConfiguration()->set('i18n.locale', $locale);
+        $this->activeLocale = $locale;
         return $this;
     }
 
@@ -225,7 +221,9 @@ class Translator
      */
     public function getLocale()
     {
-        return $this->getConfiguration()
-            ->get('i18n.locale', $this->fallbackLocale);
+        if (null == $this->activeLocale) {
+            $this->activeLocale = $this->fallbackLocale;
+        }
+        return $this->activeLocale;
     }
 }

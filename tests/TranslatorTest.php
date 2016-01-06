@@ -38,7 +38,7 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('utilizador', $myTranslator->translatePlural('user', 'users', 1));
         $this->assertEquals('utilizadores', $myTranslator->translatePlural('user', 'users', 2));
         $translator->setLocale('pt_PT');
-        $this->assertEquals('pt_PT', $translator->getConfiguration()->get('i18n.locale'));
+        $this->assertEquals('pt_PT', $translator->getLocale());
     }
 }
 
