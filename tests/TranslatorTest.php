@@ -9,9 +9,10 @@
 
 namespace Slick\Tests\I18n;
 
-use Slick\Configuration\Configuration;
-use Slick\I18n\TranslateMethods;
+use PHPUnit_Framework_TestCase as TestCase;
 use Slick\I18n\Translator;
+use Zend\I18n\Translator\Translator as ZendTranslator;
+use PHPUnit_Framework_MockObject_MockObject as MockObject;
 
 /**
  * Translator Test Case
@@ -19,8 +20,35 @@ use Slick\I18n\Translator;
  * @package Slick\Tests\I18n
  * @author  Filipe Silva <silvam.filipe@gmail.com>
  */
-class TranslatorTest extends \PHPUnit_Framework_TestCase
+class TranslatorTest extends TestCase
 {
+
+    /**
+     * @var Translator
+     */
+    protected $translator;
+
+    /**
+     * Creates the SUT object translator
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->translator = Translator::getInstance();
+    }
+
+    /**
+     * Should create a translation service
+     * @test
+     */
+    public function createTranslatorService()
+    {
+        $service = $this->translator->getTranslatorService();
+        $this->assertInstanceOf(
+            ZendTranslator::class,
+            $service
+        );
+    }
 
     /**
      * Translate messages
@@ -28,21 +56,56 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
      */
     public function translateMessages()
     {
-        Configuration::addPath(__DIR__);
-        $translator = Translator::getInstance();
-        $translator->getTranslatorService()
-            ->addTranslationFile('phparray', __DIR__.'/messages.php');
-        $myTranslator = new MyTranslator();
-        $this->assertEquals('test', $myTranslator->translate('test'));
-        $this->assertEquals('Olá mundo', $myTranslator->translate('Hello world'));
-        $this->assertEquals('utilizador', $myTranslator->translatePlural('user', 'users', 1));
-        $this->assertEquals('utilizadores', $myTranslator->translatePlural('user', 'users', 2));
-        $translator->setLocale('pt_PT');
-        $this->assertEquals('pt_PT', $translator->getLocale());
+        $service = $this->getTranslatorServiceMock(
+            ['translate', 'addTranslationFilePattern']
+        );
+        $service->expects($this->once())
+            ->method('translate')
+            ->with('user', 'default', 'en_US')
+            ->willReturn('utilizador');
+
+        $service->expects($this->once())
+            ->method('addTranslationFilePattern')
+            ->with('phparray', './I18n', '%s/default.php', 'default');
+
+        $this->translator->translatorService = $service;
+        $this->assertEquals('utilizador', $this->translator->translate('user'));
+    }
+
+    /**
+     * Should use translate plural from Zend service
+     * @test
+     */
+    public function translatePlural()
+    {
+        $service = $this->getTranslatorServiceMock(['translatePlural']);
+        $service->expects($this->once())
+            ->method('translatePlural')
+            ->with('user','users', 2, 'default', 'en_US')
+            ->willReturn('utilizadores');
+        $service->expects($this->never())
+            ->method('addTranslationFilePattern');
+        $this->translator->translatorService = $service;
+        $this->assertEquals(
+            'utilizadores',
+            $this->translator->translatePlural('user','users', 2)
+        );
+    }
+
+    /**
+     * Creates a Zend translator mocked object
+     *
+     * @param array $methods
+     *
+     * @return MockObject|ZendTranslator
+     */
+    protected function getTranslatorServiceMock($methods = [])
+    {
+        /** @var ZendTranslator|MockObject $translator */
+        $translator = $this->getMockBuilder(ZendTranslator::class)
+            ->setMethods($methods)
+            ->getMock();
+        return $translator;
     }
 }
 
-class MyTranslator
-{
-    use TranslateMethods;
-}

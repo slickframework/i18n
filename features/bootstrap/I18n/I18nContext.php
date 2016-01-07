@@ -11,7 +11,6 @@ namespace I18n;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Behat\Tester\Exception\PendingException;
 use Slick\I18n\Translator;
 use PHPUnit_Framework_Assert as Assert;
 

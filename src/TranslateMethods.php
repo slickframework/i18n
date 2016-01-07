@@ -22,12 +22,14 @@ trait TranslateMethods
      * Returns the translation for the provided message
      *
      * @param string $message
+     * @param string $domain
+     * @param string $locale
      *
      * @return string
      */
-    public function translate($message)
+    public function translate($message, $domain = null, $locale = null)
     {
-        return Translator::getInstance()->translate($message);
+        return Translator::getInstance()->translate($message, $domain, $locale);
     }
 
     /**
@@ -36,12 +38,15 @@ trait TranslateMethods
      * @param string $singular
      * @param string $plural
      * @param int    $number
+     * @param string $domain
+     * @param string $locale
      *
      * @return string
      */
-    public function translatePlural($singular, $plural, $number)
-    {
+    public function translatePlural(
+        $singular, $plural, $number, $domain = null, $locale = null
+    ) {
         return Translator::getInstance()
-            ->translatePlural($singular, $plural, $number);
+            ->translatePlural($singular, $plural, $number, $domain, $locale);
     }
 }

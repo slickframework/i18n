@@ -10,8 +10,6 @@
 namespace Slick\I18n;
 
 use Slick\Common\BaseMethods;
-use Slick\Configuration\Configuration;
-use Slick\Configuration\ConfigurationInterface as DriverInterface;
 use Zend\I18n\Translator\Translator as ZendTranslator;
 
 /**
@@ -20,7 +18,6 @@ use Zend\I18n\Translator\Translator as ZendTranslator;
  * @package Slick\I18n
  * @author  Filipe Silva <silvam.filipe@gmail.com>
  *
- * @property DriverInterface $configuration
  * @property ZendTranslator  $translatorService
  *
  * @property string $type
@@ -30,12 +27,17 @@ use Zend\I18n\Translator\Translator as ZendTranslator;
  *
  * @method Translator setBasePath(string $basePath)
  * @method Translator setDomain(string $domainName)
- * @method Translator setType(string $domainName)
+ * @method Translator setType(string $type)
+ * @method Translator setLocale(string $locale)
+ *
+ * @method string getLocale()
+ * @method string getDomain()
+ * @method string getBasePath()
  */
 class Translator
 {
 
-    const TYPE_PHP_ARRAY = 'php-array';
+    const TYPE_PHP_ARRAY = 'phparray';
     const TYPE_GETTEXT   = 'gettext';
 
     /**
@@ -46,21 +48,9 @@ class Translator
 
     /**
      * @readwrite
-     * @var DriverInterface
-     */
-    protected $configuration;
-
-    /**
-     * @readwrite
      * @var string The message domain
      */
     protected $domain = 'default';
-
-    /**
-     * @readwrite
-     * @var string Default fallback locale
-     */
-    protected $fallbackLocale = 'en_US';
 
     /**
      * @readwrite
@@ -72,25 +62,31 @@ class Translator
      * @readwrite
      * @var string
      */
-    protected $type = 'gettext';
+    protected $type = self::TYPE_PHP_ARRAY;
 
     /**
+     * @readwrite
      * @var string
      */
-    protected $activeLocale;
+    protected $locale = 'en_US';
 
     /**
      * @var array
      */
     private $types = [
-        self::TYPE_GETTEXT   => '.mo',
-        self::TYPE_PHP_ARRAY => '.php'
+        self::TYPE_GETTEXT   => ['.po', '.mo'],
+        self::TYPE_PHP_ARRAY => ['.php']
     ];
 
     /**
      * @var Translator
      */
     private static $instance;
+
+    /**
+     * @var array
+     */
+    private $loadedFiles = [];
 
     /**
      * Trait with method for base class
@@ -128,14 +124,7 @@ class Translator
     public function getTranslatorService()
     {
         if (is_null($this->translatorService)) {
-            $translator = new ZendTranslator();
-            $translator->addTranslationFilePattern(
-                $this->type,
-                $this->basePath,
-                '%s/'.$this->getMessageFile(),
-                $this->domain
-            );
-            $this->translatorService = $translator;
+            $this->translatorService = new ZendTranslator();
         }
         return $this->translatorService;
     }
@@ -143,45 +132,67 @@ class Translator
     /**
      * Returns the messages file name based on domain
      *
-     * @return string
+     * @param string $domain
+     * @param string $locale
      */
-    public function getMessageFile()
+    protected function loadFile($domain = null, $locale = null)
     {
-        $name = $this->domain;
-        $name .= $this->types[$this->type];
-        return $name;
+        $domain = $domain ?: $this->domain;
+        $locale = $locale ?: $this->locale;
+        $key = "{$this->basePath}::{$this->type}::{$locale}::{$domain}";
+
+        if (!array_key_exists($key, $this->loadedFiles)) {
+            foreach ($this->types[$this->type] as $ext) {
+                $name = "{$domain}{$ext}";
+                $this->loadedFiles[$key] = $name;
+
+                $this->getTranslatorService()->addTranslationFilePattern(
+                    $this->type,
+                    $this->basePath,
+                    "%s/{$name}",
+                    $this->domain
+                );
+            }
+        }
     }
 
     /**
      * Returns the translation for the provided message
      *
      * @param string $message
+     * @param string $domain
+     * @param string $locale
      *
      * @return string
      */
-    public function translate($message)
+    public function translate($message, $domain = null, $locale = null)
     {
+        $this->loadFile($domain, $locale);
         return $this->getTranslatorService()
-            ->translate($message, $this->domain, $this->getLocale());
+            ->translate($message, $this->getDomain(), $this->getLocale());
     }
 
     /**
      * Translate a plural message.
      *
-     * @param  string $singular
-     * @param  string $plural
-     * @param  int    $number
+     * @param string $singular
+     * @param string $plural
+     * @param int    $number
+     * @param string $domain
+     * @param string $locale
      *
      * @return string
      */
-    public function translatePlural($singular, $plural, $number)
-    {
+    public function translatePlural(
+        $singular, $plural, $number,$domain = null, $locale = null
+    ) {
+        $this->loadFile($domain, $locale);
         return $this->getTranslatorService()
             ->translatePlural(
                 $singular,
                 $plural,
                 $number,
-                $this->domain,
+                $this->getDomain(),
                 $this->getLocale()
             );
     }
@@ -199,31 +210,5 @@ class Translator
             self::$instance = new Translator($options);
         }
         return self::$instance;
-    }
-
-    /**
-     * Sets locale
-     *
-     * @param $locale
-     *
-     * @returns Translator
-     */
-    public function setLocale($locale)
-    {
-        $this->activeLocale = $locale;
-        return $this;
-    }
-
-    /**
-     * Gets current configured locale
-     *
-     * @return string
-     */
-    public function getLocale()
-    {
-        if (null == $this->activeLocale) {
-            $this->activeLocale = $this->fallbackLocale;
-        }
-        return $this->activeLocale;
     }
 }
