@@ -39,7 +39,7 @@ return [
         ),
     'Hello world' => 'Olá mundo',
     'User' => ['Utilizador', 'Utilizadores'],
-    'Users' = ''
+    'Users' => ''
 ];
 
 ```
