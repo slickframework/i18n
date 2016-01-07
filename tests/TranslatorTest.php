@@ -10,6 +10,7 @@
 namespace Slick\Tests\I18n;
 
 use PHPUnit_Framework_TestCase as TestCase;
+use Slick\I18n\TranslateMethods;
 use Slick\I18n\Translator;
 use Zend\I18n\Translator\Translator as ZendTranslator;
 use PHPUnit_Framework_MockObject_MockObject as MockObject;
@@ -27,6 +28,11 @@ class TranslatorTest extends TestCase
      * @var Translator
      */
     protected $translator;
+
+    /**
+     * Use the trait for translation
+     */
+    use TranslateMethods;
 
     /**
      * Creates the SUT object translator
@@ -69,14 +75,14 @@ class TranslatorTest extends TestCase
             ->with('phparray', './I18n', '%s/default.php', 'default');
 
         $this->translator->translatorService = $service;
-        $this->assertEquals('utilizador', $this->translator->translate('user'));
+        $this->assertEquals('utilizador', $this->translate('user'));
     }
 
     /**
      * Should use translate plural from Zend service
      * @test
      */
-    public function translatePlural()
+    public function translateMessagesPlural()
     {
         $service = $this->getTranslatorServiceMock(['translatePlural']);
         $service->expects($this->once())
@@ -88,7 +94,7 @@ class TranslatorTest extends TestCase
         $this->translator->translatorService = $service;
         $this->assertEquals(
             'utilizadores',
-            $this->translator->translatePlural('user','users', 2)
+            $this->translatePlural('user','users', 2)
         );
     }
 

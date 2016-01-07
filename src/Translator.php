@@ -74,8 +74,8 @@ class Translator
      * @var array
      */
     private $types = [
-        self::TYPE_GETTEXT   => ['.po', '.mo'],
-        self::TYPE_PHP_ARRAY => ['.php']
+        self::TYPE_GETTEXT   => '.mo',
+        self::TYPE_PHP_ARRAY => '.php'
     ];
 
     /**
@@ -134,6 +134,8 @@ class Translator
      *
      * @param string $domain
      * @param string $locale
+     *
+     * @return array
      */
     protected function loadFile($domain = null, $locale = null)
     {
@@ -142,18 +144,18 @@ class Translator
         $key = "{$this->basePath}::{$this->type}::{$locale}::{$domain}";
 
         if (!array_key_exists($key, $this->loadedFiles)) {
-            foreach ($this->types[$this->type] as $ext) {
-                $name = "{$domain}{$ext}";
-                $this->loadedFiles[$key] = $name;
+            $name = "{$domain}{$this->types[$this->type]}";
+            $this->loadedFiles[$key] = $name;
 
-                $this->getTranslatorService()->addTranslationFilePattern(
-                    $this->type,
-                    $this->basePath,
-                    "%s/{$name}",
-                    $this->domain
-                );
-            }
+            $this->getTranslatorService()->addTranslationFilePattern(
+                $this->type,
+                $this->basePath,
+                "%s/{$name}",
+                $domain
+            );
         }
+
+        return [$domain, $locale];
     }
 
     /**
@@ -167,9 +169,9 @@ class Translator
      */
     public function translate($message, $domain = null, $locale = null)
     {
-        $this->loadFile($domain, $locale);
+        list($domain, $locale) = $this->loadFile($domain, $locale);
         return $this->getTranslatorService()
-            ->translate($message, $this->getDomain(), $this->getLocale());
+            ->translate($message, $domain, $locale);
     }
 
     /**
@@ -186,15 +188,9 @@ class Translator
     public function translatePlural(
         $singular, $plural, $number,$domain = null, $locale = null
     ) {
-        $this->loadFile($domain, $locale);
+        list($domain, $locale) = $this->loadFile($domain, $locale);
         return $this->getTranslatorService()
-            ->translatePlural(
-                $singular,
-                $plural,
-                $number,
-                $this->getDomain(),
-                $this->getLocale()
-            );
+            ->translatePlural($singular, $plural, $number, $domain, $locale);
     }
 
     /**

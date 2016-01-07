@@ -98,4 +98,18 @@ class I18nContext extends \AbstractContext implements
         $this->lastTranslation = $this->translator
             ->translatePlural($singular, $plural, $count);
     }
+
+    /**
+     * Request translation on given domain
+     *
+     * @When /^I translate "([^"]*)" on "([^"]*)" domain$/
+     *
+     * @param string $message
+     * @param string $domain
+     */
+    public function translateOnDomain($message, $domain)
+    {
+        $this->lastTranslation = $this->translator
+            ->translate($message, $domain);
+    }
 }
