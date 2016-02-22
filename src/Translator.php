@@ -10,8 +10,6 @@
 namespace Slick\I18n;
 
 use Slick\Common\BaseMethods;
-use Slick\Configuration\Configuration;
-use Slick\Configuration\ConfigurationInterface as DriverInterface;
 use Zend\I18n\Translator\Translator as ZendTranslator;
 
 /**
@@ -20,64 +18,75 @@ use Zend\I18n\Translator\Translator as ZendTranslator;
  * @package Slick\I18n
  * @author  Filipe Silva <silvam.filipe@gmail.com>
  *
- * @property DriverInterface $configuration
  * @property ZendTranslator  $translatorService
  *
  * @property string $type
  * @property string $basePath
  * @property string $domain
  * @property string $fallbackLocale
+ *
+ * @method Translator setBasePath(string $basePath)
+ * @method Translator setDomain(string $domainName)
+ * @method Translator setType(string $type)
+ * @method Translator setLocale(string $locale)
+ *
+ * @method string getLocale()
+ * @method string getDomain()
+ * @method string getBasePath()
  */
 class Translator
 {
+
+    const TYPE_PHP_ARRAY = 'phparray';
+    const TYPE_GETTEXT   = 'gettext';
+
     /**
      * @readwrite
      * @var ZendTranslator
      */
-    protected $_translatorService;
-
-    /**
-     * @readwrite
-     * @var DriverInterface
-     */
-    protected $_configuration;
+    protected $translatorService;
 
     /**
      * @readwrite
      * @var string The message domain
      */
-    protected $_domain = 'default';
-
-    /**
-     * @readwrite
-     * @var string Default fallback locale
-     */
-    protected $_fallbackLocale = 'en_US';
+    protected $domain = 'default';
 
     /**
      * @readwrite
      * @var string
      */
-    protected $_basePath = './I18n';
+    protected $basePath = './I18n';
 
     /**
      * @readwrite
      * @var string
      */
-    protected $_type = 'gettext';
+    protected $type = self::TYPE_PHP_ARRAY;
+
+    /**
+     * @readwrite
+     * @var string
+     */
+    protected $locale = 'en_US';
 
     /**
      * @var array
      */
-    private $_types = [
-        'gettext' => '.mo',
-        'phparray' => '.php'
+    private $types = [
+        self::TYPE_GETTEXT   => '.mo',
+        self::TYPE_PHP_ARRAY => '.php'
     ];
 
     /**
      * @var Translator
      */
-    private static $_instance;
+    private static $instance;
+
+    /**
+     * @var array
+     */
+    private $loadedFiles = [];
 
     /**
      * Trait with method for base class
@@ -108,94 +117,80 @@ class Translator
     }
 
     /**
-     * Private unserialize method to prevent unserializing of the *Singleton*
-     * instance.
-     *
-     * @codeCoverageIgnore
-     * @SuppressWarnings(PHPMD.UnusedPrivateMethod)
-     * @return void
-     */
-    private function __wakeup()
-    {
-    }
-
-    /**
-     * Lazy loads configuration
-     *
-     * @return DriverInterface
-     */
-    public function getConfiguration()
-    {
-        if (is_null($this->_configuration)) {
-            $this->_configuration = Configuration::get('config');
-        }
-        return $this->_configuration;
-    }
-
-    /**
      * Lazy loads zend translator
      *
      * @return ZendTranslator
      */
     public function getTranslatorService()
     {
-        if (is_null($this->_translatorService)) {
-            $translator = new ZendTranslator();
-            $translator->addTranslationFilePattern(
-                $this->type,
-                $this->basePath,
-                '%s/'.$this->getMessageFile(),
-                $this->domain
-            );
-            $this->_translatorService = $translator;
+        if (is_null($this->translatorService)) {
+            $this->translatorService = new ZendTranslator();
         }
-        return $this->_translatorService;
+        return $this->translatorService;
     }
 
     /**
      * Returns the messages file name based on domain
      *
-     * @return string
+     * @param string $domain
+     * @param string $locale
+     *
+     * @return array
      */
-    public function getMessageFile()
+    protected function loadFile($domain = null, $locale = null)
     {
-        $name = $this->domain;
-        $name .= $this->_types[$this->type];
-        return $name;
+        $domain = $domain ?: $this->domain;
+        $locale = $locale ?: $this->locale;
+        $key = "{$this->basePath}::{$this->type}::{$locale}::{$domain}";
+
+        if (!array_key_exists($key, $this->loadedFiles)) {
+            $name = "{$domain}{$this->types[$this->type]}";
+            $this->loadedFiles[$key] = $name;
+
+            $this->getTranslatorService()->addTranslationFilePattern(
+                $this->type,
+                $this->basePath,
+                "%s/{$name}",
+                $domain
+            );
+        }
+
+        return [$domain, $locale];
     }
 
     /**
      * Returns the translation for the provided message
      *
      * @param string $message
+     * @param string $domain
+     * @param string $locale
      *
      * @return string
      */
-    public function translate($message)
+    public function translate($message, $domain = null, $locale = null)
     {
+        list($domain, $locale) = $this->loadFile($domain, $locale);
         return $this->getTranslatorService()
-            ->translate($message, $this->domain, $this->getLocale());
+            ->translate($message, $domain, $locale);
     }
 
     /**
      * Translate a plural message.
      *
-     * @param  string $singular
-     * @param  string $plural
-     * @param  int    $number
+     * @param string $singular
+     * @param string $plural
+     * @param int    $number
+     * @param string $domain
+     * @param string $locale
      *
      * @return string
      */
-    public function translatePlural($singular, $plural, $number)
-    {
+    public function translatePlural(
+        $singular, $plural, $number,$domain = null, $locale = null
+    ) {
+        list($domain, $locale) = $this->loadFile($domain, $locale);
         return $this->getTranslatorService()
-            ->translatePlural(
-                $singular,
-                $plural,
-                $number,
-                $this->domain,
-                $this->getLocale()
-            );
+            ->translatePlural($singular, $plural, $number, $domain, $locale);
     }
 
     /**
@@ -207,33 +202,9 @@ class Translator
      */
     public static function getInstance($options = array())
     {
-        if (is_null(self::$_instance)) {
-            self::$_instance = new Translator($options);
+        if (is_null(self::$instance)) {
+            self::$instance = new Translator($options);
         }
-        return self::$_instance;
-    }
-
-    /**
-     * Sets locale
-     *
-     * @param $locale
-     *
-     * @returns Translator
-     */
-    public function setLocale($locale)
-    {
-        $this->getConfiguration()->set('i18n.locale', $locale);
-        return $this;
-    }
-
-    /**
-     * Gets current configured locale
-     *
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->configuration->
-        get('i18n.locale', $this->fallbackLocale);
+        return self::$instance;
     }
 }

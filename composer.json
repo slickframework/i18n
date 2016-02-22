@@ -4,7 +4,7 @@
   "license": "MIT",
   "homepage": "https://github.com/slickframework/tempalte",
   "keywords": ["slick", "i18n", "translation"],
-  "version": "v1.0.4",
+  "version": "v1.2.0",
   "authors": [
     {
       "name": "Filipe Silva",
@@ -24,9 +24,8 @@
   },
   "require": {
     "slick/common": "@dev",
-    "zendframework/zend-i18n": ">=2.2.5",
-    "zendframework/zend-servicemanager": "2.2.5",
-    "slick/configuration": "1.2.x-dev"
+    "zendframework/zend-i18n": "^2.6",
+    "zendframework/zend-servicemanager": "^2.6"
   },
   "require-dev": {
     "phpunit/phpunit" : "4.*",
@@ -35,8 +34,8 @@
   },
   "extra": {
     "branch-alias": {
-      "dev-master": "1.0-dev",
-      "dev-develop": "1.1-dev"
+      "dev-master": "1.2-dev",
+      "dev-develop": "1.3-dev"
     }
   }
 }
