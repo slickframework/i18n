@@ -2,7 +2,7 @@
 
 All Notable changes to `Slick/i18n` will be documented in this file.
 
-## 1.2.0 - 2015-??-??
+## 1.2.0 - 2015-20-22
 
 ### Added
 - Multiple domain on translation
