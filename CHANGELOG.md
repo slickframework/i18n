@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Code of conduct
+- PHPSpec for unit and specification tests
+
+### Removed
+- Behavior tests with behat
+- Unit test with PHPUnit
 
 ## [v1.2.0] - 2015-20-22
 
