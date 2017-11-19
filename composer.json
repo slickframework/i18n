@@ -2,7 +2,7 @@
   "name": "slick/i18n",
   "description": "Internationalization and string translation package Slick Framework",
   "license": "MIT",
-  "minimum-stability": "stable",
+  "minimum-stability": "dev",
   "homepage": "https://github.com/slickframework/tempalte",
   "keywords": ["slick", "i18n", "translation"],
   "version": "v1.3.1",
