@@ -1,9 +1,0 @@
-# Behat configuration file
-default:
-  suites:
-    default:
-      contexts:
-        - FeatureContext
-        - I18n\I18nContext
-      paths:
-        - %paths.base%/features

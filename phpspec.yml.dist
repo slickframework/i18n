@@ -1,0 +1,4 @@
+suites:
+  slick_di_suite:
+    namespace: Slick\I18n
+    psr4_prefix: Slick\I18n

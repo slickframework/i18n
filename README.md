@@ -1,13 +1,12 @@
 # Slick I18n package
 
-[![Latest Version](https://img.shields.io/github/release/slickframework/i18n.svg?style=flat-square)](https://github.com/slickframework/i18n/releases)
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/slickframework/i18n/develop.svg?style=flat-square)](https://travis-ci.org/slickframework/i18n)
-[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/slickframework/i18n/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/slickframework/i18n/code-structure?branch=develop)
-[![Quality Score](https://img.shields.io/scrutinizer/g/slickframework/i18n/develop.svg?style=flat-square)](https://scrutinizer-ci.com/g/slickframework/i18n?branch=develop)
-[![Total Downloads](https://img.shields.io/packagist/dt/slick/i18n.svg?style=flat-square)](https://packagist.org/packages/slick/i18n)
+[![Latest Version on Packagist][ico-version]][link-packagist]
+[![Software License][ico-license]](LICENSE.md)
+[![Build Status][ico-travis]][link-travis]
+[![Quality Score][ico-code-quality]][link-code-quality]
+[![Total Downloads][ico-downloads]][link-downloads]
 
-Slick I18n is a simple translation and internationalization package for Slick.
+Slick I18n is a simple translation and internationalization package.
 It depends on Zend/I18n which is a complete translation suite that supports all
 major formats and includes popular features like plural translations and text domains.
 
@@ -44,7 +43,7 @@ return [
 
 ```
 
-save this file in `./i18n/pt_PT/default.php`.
+save this file in `./i18n/pt_PT/messages.php`.
 
 ### Language negotiation and setup
 
@@ -52,6 +51,8 @@ Now lets get our translator:
 
 ```php
 
+use Slick\I18n\Language;
+use Slick\I18n\Translation;
 use Slick\I18n\Translator;
 
 /**
@@ -62,9 +63,9 @@ if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 }
 
-Translator::getInstance()
-    ->setLocale($locale)
-    ->setType(Translator::TYPE_PHP_ARRAY);
+$translation = new Translation(new Language($locale), __DIR__.'/i18n');
+$translator = new Translator($translation);
+
     
 setlocale(LC_ALL, $locale);
 
@@ -77,31 +78,34 @@ on the strings you want to translate.
 ### Message translation
 
 ```php
-$t = Translator::getInstance();
-
-echo $t->translate('Hello world');  // will output 'Olá mundo' 
+echo $translator->translate('Hello world');  // will output 'Olá mundo' 
 ```
 
 ### Plural translation
 
 ```php
-$t = Translator::getInstance();
-
-echo $t->translatePlural('User', 'Users', 2);  // will output 'Utilizadores' 
+echo $translator->translatePlural('User', 'Users', 2);  // will output 'Utilizadores' 
 ```
 
 ### Using in your classes
 
 You can add translation functionality to your classes by using the
-`TranslateMethods` trait.
+`TranslateMethods` trait and injecting the translator.
 
 ```php
 use Slick\I18n\TranslateMethods;
+use Slick\I18n\TranslationCapableInterface;
+use Slick\I18n\TranslatotInterface;
 
-class MyClass
+class MyClass implements TranslationCapableInterface
 {
 
     use TranslateMethods;
+
+    public function __construct(TranslatotInterface $translator)
+    {
+        $this->tranlator = $translator;
+    }  
     
     public function getUsers()
     {
@@ -111,26 +115,42 @@ class MyClass
  
 ```
 
+## Change log
+
+Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
+
 ## Testing
 
 ``` bash
-$ vendor/bin/phpunit
+$ composer test
 ```
 
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](CONTRIBUTING.md) and [CODE_OF_CONDUCT](CONDUCT.md) for details.
 
 ## Security
 
-If you discover any security related issues, please email silvam.filipe@gmail.com instead of using the issue tracker.
+If you discover any security related issues, please email slick.framework@gmail.com instead of using the issue tracker.
 
 ## Credits
 
-- [Slick framework](https://github.com/slickframework)
-- [All Contributors](https://github.com/slickframework/common/graphs/contributors)
+- [All Contributors][link-contributors]
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Please see [License File](LICENSE) for more information.
 
+[ico-version]: https://img.shields.io/packagist/v/slick/i18n.svg?style=flat-square
+[ico-license]: https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square
+[ico-travis]: https://img.shields.io/travis/slickframework/i18n/master.svg?style=flat-square
+[ico-scrutinizer]: https://img.shields.io/scrutinizer/coverage/g/slickframework/i18n.svg?style=flat-square
+[ico-code-quality]: https://img.shields.io/scrutinizer/g/slickframework/i18n.svg?style=flat-square
+[ico-downloads]: https://img.shields.io/packagist/dt/slick/i18n.svg?style=flat-square
+
+[link-packagist]: https://packagist.org/packages/slick/i18n
+[link-travis]: https://travis-ci.org/slickframework/i18n
+[link-scrutinizer]: https://scrutinizer-ci.com/g/slickframework/i18n/code-structure
+[link-code-quality]: https://scrutinizer-ci.com/g/slickframework/i18n
+[link-downloads]: https://packagist.org/packages/slickframework/i18n
+[link-contributors]: https://github.com/slickframework/i18n/graphs/contributors
