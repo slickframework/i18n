@@ -8,11 +8,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
+- TranslateMethods now check is class has the translator object set
+- TranslatorInterface for a better abstract usage
+- Translation object to encapsulate different domains, locales and files 
+- Language database
+- Language value object
 - Code of conduct
 - PHPSpec for unit and specification tests
 
+### Changed
+- TYPE_PHP_ARRAY and TYPE_GETTEX are noe in the Translation class
+
 ### Removed
-- Behavior tests with behat
+- Translator::getInstance() was removed. It should be used in conjunction with
+  a dependency injection container.
 - Unit test with PHPUnit
 
 ## [v1.2.0] - 2015-20-22

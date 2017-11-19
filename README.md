@@ -43,7 +43,7 @@ return [
 
 ```
 
-save this file in `./i18n/pt_PT/default.php`.
+save this file in `./i18n/pt_PT/messages.php`.
 
 ### Language negotiation and setup
 
@@ -51,6 +51,8 @@ Now lets get our translator:
 
 ```php
 
+use Slick\I18n\Language;
+use Slick\I18n\Translation;
 use Slick\I18n\Translator;
 
 /**
@@ -61,9 +63,9 @@ if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
     $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
 }
 
-Translator::getInstance()
-    ->setLocale($locale)
-    ->setType(Translator::TYPE_PHP_ARRAY);
+$translation = new Translation(new Language($locale), __DIR__.'/i18n');
+$translator = new Translator($translation);
+
     
 setlocale(LC_ALL, $locale);
 
@@ -76,31 +78,34 @@ on the strings you want to translate.
 ### Message translation
 
 ```php
-$t = Translator::getInstance();
-
-echo $t->translate('Hello world');  // will output 'Olá mundo' 
+echo $translator->translate('Hello world');  // will output 'Olá mundo' 
 ```
 
 ### Plural translation
 
 ```php
-$t = Translator::getInstance();
-
-echo $t->translatePlural('User', 'Users', 2);  // will output 'Utilizadores' 
+echo $translator->translatePlural('User', 'Users', 2);  // will output 'Utilizadores' 
 ```
 
 ### Using in your classes
 
 You can add translation functionality to your classes by using the
-`TranslateMethods` trait.
+`TranslateMethods` trait and injecting the translator.
 
 ```php
 use Slick\I18n\TranslateMethods;
+use Slick\I18n\TranslationCapableInterface;
+use Slick\I18n\TranslatotInterface;
 
-class MyClass
+class MyClass implements TranslationCapableInterface
 {
 
     use TranslateMethods;
+
+    public function __construct(TranslatotInterface $translator)
+    {
+        $this->tranlator = $translator;
+    }  
     
     public function getUsers()
     {
@@ -109,8 +114,6 @@ class MyClass
 }
  
 ```
-
-Please check [documentation site](http://i18n.slick-framework.com) for a complete reference. 
 
 ## Change log
 
