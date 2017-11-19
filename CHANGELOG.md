@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [v1.3.0] - 2017-11-19
+
 ### Added
 - TranslateMethods now check is class has the translator object set
 - TranslatorInterface for a better abstract usage
@@ -24,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   a dependency injection container.
 - Unit test with PHPUnit
 
-## [v1.2.0] - 2015-20-22
+## [v1.2.0] - 2016-02-22
 
 ### Added
 - Multiple domain on translation
@@ -42,5 +44,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial package release
 
-[Unreleased]: https://github.com/slickframework/i18n/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/slickframework/i18n/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/slickframework/i18n/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/slickframework/i18n/compare/v1.0.4...v1.2.0
