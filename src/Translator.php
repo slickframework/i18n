@@ -125,7 +125,7 @@ class Translator implements TranslatorInterface
         $locale = null
     )
     {
-        $textDomain = $textDomain !== 'default' ?: $this->domain();
+        $textDomain = $textDomain !== 'default' ? $textDomain : $this->domain();
         $locale = $locale ?: (string) $this->currentLanguage();
 
         return $this->translationService()->translatePlural($singular, $plural, $number, $textDomain, $locale);
